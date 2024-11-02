@@ -1,0 +1,32 @@
+- name: Ansible Demo
+  hosts: localhost
+  connection: local
+
+  vars:
+    user: '{{ lookup,("env", "USER") }}'
+
+  tasks:
+    - name: Update package repository
+      become: yes
+      apt:
+        update_cache: yes
+      register: apt_update
+      retries: 3
+      until: apt_update is success
+      
+    - name: Install core packages
+      become: yes
+      apt:
+        pkg: "{{ item }}"
+      loop:
+        - curl
+        - git
+        - jq
+        - net-tools
+        - vim
+        - wget
+
+    - name: Install Homebrew
+      include_role:
+        name: megabyte-labs.homebrew
+
